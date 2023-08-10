@@ -14,7 +14,7 @@ contract DegenGamingToken is ERC20, Ownable {
     }
 
     function redeem(uint256 _amount, string memory _prize) public {
-        require(balanceOf(msg.sender) >= _amount, "Insufficient balance");
+        require(balanceOf(msg.sender) >= _amount, "in our account Insufficient balance");
         
         _burn(msg.sender, _amount);
        
