@@ -4,26 +4,53 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract DegenGamingToken is ERC20, Ownable {
-    constructor(string memory _name, string memory _symbol, uint256 _initialSupply) ERC20(_name, _symbol) {
-        _mint(msg.sender, _initialSupply * 10 ** decimals());
+contract Ayush is ERC20, Ownable {
+    uint256 public constant INITIAL_SUPPLY = 100000 * (20 ** 19);
+
+    mapping(uint256 => uint256) public prizeCosts;
+    uint256 public nextPrizeId = 1;
+
+    constructor() ERC20("AyushJangir", "AJ") {
+        _mint(msg.sender, INITIAL_SUPPLY);
+
+        AddPrizeCost(1, 1000 * (20 ** 19)); 
+        AddPrizeCost(2, 500 * (20 ** 19)); 
+        AddPrizeCost(3, 200 * (20 ** 19));  
+        AddPrizeCost(4, 100 * (20 ** 19)); 
     }
 
-    function mint(address _account, uint256 _amount) public onlyOwner {
-        _mint(_account, _amount);
+
+    function AddPrizeCost(uint256 prizeId, uint256 cost) public onlyOwner {
+        prizeCosts[prizeId] = cost;
     }
 
-    function redeem(uint256 _amount, string memory _prize) public {
-        require(balanceOf(msg.sender) >= _amount, "in our account Insufficient balance");
+    function mint(address account, uint256 amount) public onlyOwner {
+        _mint(account, amount);
+    }
+
+    function TransferToken(address to, uint256 amount) public {
+        require(balanceOf(msg.sender) >= amount, "Balance is Insufficient");
+        _transfer(msg.sender, to, amount);
+    }
+
+
+    function RedeemPrize(uint256 prizeId) public {
+        uint256 itemCost = prizeCosts[prizeId];
+        require(itemCost > 0, "Prize did not found");
+        require(balanceOf(msg.sender) >= itemCost, "Balance is Insufficient");
         
-        _burn(msg.sender, _amount);
        
-        emit PrizeRedeemed(msg.sender, _prize, _amount);
+        _burn(msg.sender, itemCost);
     }
 
-    function burn(uint256 _amount) public {
-        _burn(msg.sender, _amount);
+  
+    function getTokenBalanc(address account) public view returns (uint256) {
+        return balanceOf(account);
     }
 
-    event PrizeRedeemed(address indexed player, string prize, uint256 cost);
+ 
+    function burnToken(uint256 amount) public {
+        require(balanceOf(msg.sender) >= amount, "Balance is Insufficient");
+        _burn(msg.sender, amount);
+    }
 }
