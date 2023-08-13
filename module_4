@@ -4,53 +4,43 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Ayush is ERC20, Ownable {
-    uint256 public constant INITIAL_SUPPLY = 100000 * (20 ** 19);
+contract AyushToken is ERC20, Ownable {
+    uint256 public constant INITIAL_SUPPLY = 100000 * (30 ** 19);
 
     mapping(uint256 => uint256) public prizeCosts;
     uint256 public nextPrizeId = 1;
 
-    constructor() ERC20("AyushJangir", "AJ") {
+    constructor() ERC20("AyushToken", "AYT") {
         _mint(msg.sender, INITIAL_SUPPLY);
 
-        AddPrizeCost(1, 1000 * (20 ** 19)); 
-        AddPrizeCost(2, 500 * (20 ** 19)); 
-        AddPrizeCost(3, 200 * (20 ** 19));  
-        AddPrizeCost(4, 100 * (20 ** 19)); 
+        _addPrizeCost(1, 5000 * (30 ** 19)); 
+        _addPrizeCost(2, 4000 * (30 ** 19)); 
+        _addPrizeCost(3, 2000 * (30 ** 19));  
+        _addPrizeCost(4, 1000 * (30 ** 19)); 
     }
 
-
-    function AddPrizeCost(uint256 prizeId, uint256 cost) public onlyOwner {
+    function _addPrizeCost(uint256 prizeId, uint256 cost) internal onlyOwner {
         prizeCosts[prizeId] = cost;
     }
 
-    function mint(address account, uint256 amount) public onlyOwner {
+    function mintTokens(address account, uint256 amount) public onlyOwner {
         _mint(account, amount);
     }
 
-    function TransferToken(address to, uint256 amount) public {
-        require(balanceOf(msg.sender) >= amount, "Balance is Insufficient");
-        _transfer(msg.sender, to, amount);
-    }
-
-
-    function RedeemPrize(uint256 prizeId) public {
+    function redeemPrize(uint256 prizeId) public {
         uint256 itemCost = prizeCosts[prizeId];
-        require(itemCost > 0, "Prize did not found");
-        require(balanceOf(msg.sender) >= itemCost, "Balance is Insufficient");
+        require(itemCost > 0, "Prize is not found");
+        require(balanceOf(msg.sender) >= itemCost, "you have Insufficient balance");
         
-       
         _burn(msg.sender, itemCost);
     }
 
-  
-    function getTokenBalanc(address account) public view returns (uint256) {
+    function getTokenBalance(address account) public view returns (uint256) {
         return balanceOf(account);
     }
 
- 
-    function burnToken(uint256 amount) public {
-        require(balanceOf(msg.sender) >= amount, "Balance is Insufficient");
+    function burnTokens(uint256 amount) public {
+        require(balanceOf(msg.sender) >= amount, "you have Insufficient balance");
         _burn(msg.sender, amount);
     }
 }
